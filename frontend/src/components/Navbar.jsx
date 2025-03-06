@@ -9,37 +9,20 @@ export default function Navigation() {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch user data from backend (Check if logged in)
+  // Check for user authentication
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/auth/user`, {
-          method: "GET",
-          credentials: "include",
-        });
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-    fetchUser();
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser)); // ✅ Load user from localStorage
+    }
   }, []);
 
   // Handle Logout
-  const handleLogout = async () => {
-    try {
-      await fetch(`${BACKEND_URL}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
-      setUser(null);
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // ✅ Clear token
+    localStorage.removeItem("user"); // ✅ Clear user data
+    setUser(null);
+    navigate("/login"); // ✅ Redirect to login
   };
 
   // Handle Search
@@ -78,12 +61,9 @@ export default function Navigation() {
 
             {/* Navigation Links */}
             <Nav className="ms-auto">
-              <Nav.Link as={Link} to="/post">➕ Post Recipe</Nav.Link>
-              <Nav.Link as={Link} to="/about">About</Nav.Link>
-              <Nav.Link as={Link} to="/contact">Contact Us</Nav.Link>
-
               {user ? (
                 <>
+                  <Nav.Link as={Link} to="/post">➕ Post Recipe</Nav.Link>
                   <Nav.Link as={Link} to="/profile">👤 {user.username}</Nav.Link>
                   <Button variant="outline-danger" className="ms-2" onClick={handleLogout}>🚪 Logout</Button>
                 </>
