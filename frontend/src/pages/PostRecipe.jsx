@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Form, Button } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
 
-const API_BASE_URL = "https://backend-swr5.onrender.com"; // Backend URL
+const API_BASE_URL = "https://backend-swr5.onrender.com"; // Backend link
 
 export default function PostRecipe() {
   const [recipe, setRecipe] = useState({
@@ -13,42 +12,19 @@ export default function PostRecipe() {
     cookingTime: "",
   });
 
-  const [message, setMessage] = useState(""); // Success/Error Message
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
+  const [message, setMessage] = useState(""); // To display success/error messages
 
-  // Check if user is logged in
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (!storedUser) {
-      navigate("/login"); // Redirect to login if not logged in
-    } else {
-      setUser(JSON.parse(storedUser));
-    }
-  }, [navigate]);
-
-  // Handle Input Change
   const handleChange = (e) => {
     setRecipe({ ...recipe, [e.target.name]: e.target.value });
   };
 
-  // Handle Recipe Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      setMessage("❌ Unauthorized. Please log in.");
-      return;
-    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/recipes`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // ✅ Send auth token
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(recipe),
       });
 
@@ -69,7 +45,7 @@ export default function PostRecipe() {
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4">📌 Post a New Recipe</h2>
-
+      
       {message && <p className="alert alert-info">{message}</p>} {/* Display success/error messages */}
 
       <Form onSubmit={handleSubmit} className="shadow-lg p-4 bg-white rounded">
