@@ -1,56 +1,44 @@
-import React, { useState, useEffect } from "react";
-import RecipeCard from "../components/RecipeCard";
-import { useNavigate } from "react-router-dom";
-
-const API_BASE_URL = "https://backend-swr5.onrender.com"; // Backend link
+import React, { useEffect, useState } from "react";
 
 const RecipeList = () => {
-  const [recipes, setRecipes] = useState([]); // Store fetched recipes
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(""); // Error state
+    const [recipes, setRecipes] = useState([]);
 
-  const navigate = useNavigate();
+    useEffect(() => {
+        const fetchRecipes = async () => {
+            try {
+                const response = await fetch("https://backend-swr5.onrender.com/api/recipes");
+                if (!response.ok) throw new Error("Failed to fetch recipes");
 
-  // Fetch recipes from backend
-  useEffect(() => {
-    const fetchRecipes = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/recipes`);
-        if (!response.ok) throw new Error("Failed to fetch recipes");
+                const data = await response.json();
+                console.log("Fetched Recipes:", data); // Debugging
+                setRecipes(data);
+            } catch (error) {
+                console.error("Error fetching recipes:", error);
+            }
+        };
 
-        const data = await response.json();
-        setRecipes(data); // Store recipes
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+        fetchRecipes();
+    }, []);
 
-    fetchRecipes();
-  }, []);
-
-  // Navigate to edit page
-  const handleEdit = (recipe) => {
-    navigate(`/edit/${recipe._id}`); // Use MongoDB _id instead of static id
-  };
-
-  return (
-    <div className="container mt-4">
-      <h2>All Recipes</h2>
-
-      {loading && <p className="text-center">⏳ Loading recipes...</p>}
-      {error && <p className="text-danger text-center">❌ {error}</p>}
-
-      <div className="row">
-        {recipes.map((recipe) => (
-          <div key={recipe._id} className="col-md-4">
-            <RecipeCard recipe={recipe} onEdit={handleEdit} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+    return (
+        <div className="container mt-5">
+            <h2 className="text-center">All Recipes</h2>
+            <div className="row">
+                {recipes.length > 0 ? recipes.map((recipe) => (
+                    <div key={recipe._id} className="col-md-4">
+                        <div className="card shadow-lg mb-4">
+                            <img src={recipe.imageUrl || "default-image.jpg"} className="card-img-top" alt={recipe.name} />
+                            <div className="card-body">
+                                <h5 className="card-title">{recipe.name}</h5>
+                                <p className="card-text">Cooking Time: {recipe.cookingTime} mins</p>
+                                <a href={`/recipe/${recipe._id}`} className="btn btn-primary">View Recipe</a>
+                            </div>
+                        </div>
+                    </div>
+                )) : <p>No recipes available</p>}
+            </div>
+        </div>
+    );
 };
 
 export default RecipeList;
