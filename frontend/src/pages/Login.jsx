@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
 
     try {
-      const response = await fetch("https://your-backend-url.com/api/auth/login", {
+      const response = await fetch("https://backend-swr5.onrender.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -20,28 +21,48 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Save token to localStorage
+        // Save token in localStorage
         localStorage.setItem("token", data.token);
 
-        // Redirect to the page the user was trying to access (e.g., /post)
-        const from = location.state?.from || "/";
-        navigate(from, { replace: true });
+        // Redirect to the Recipe List Page after successful login
+        navigate("/");
       } else {
-        alert(data.message || "Login failed. Please try again.");
+        setError(data.message || "Login failed. Please check your credentials.");
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert("Something went wrong. Please try again.");
+      setError("Something went wrong. Please try again.");
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        <button type="submit">Login</button>
+    <div className="container mt-4">
+      <h2 className="text-center">Login</h2>
+      {error && <p className="text-danger text-center">{error}</p>}
+      <form onSubmit={handleLogin} className="mx-auto" style={{ maxWidth: "400px" }}>
+        <div className="mb-3">
+          <label>Email</label>
+          <input
+            type="email"
+            className="form-control"
+            placeholder="Enter email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label>Password</label>
+          <input
+            type="password"
+            className="form-control"
+            placeholder="Enter password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
+        <button type="submit" className="btn btn-primary w-100">Login</button>
       </form>
     </div>
   );
