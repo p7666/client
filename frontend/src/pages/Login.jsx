@@ -1,77 +1,50 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const API_BASE_URL = "https://backend-swr5.onrender.com"; // Backend URL
-
-export default function Login() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const response = await fetch("https://your-backend-url.com/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("token", data.token); // Store token
-        navigate("/"); // Redirect to home page
+        // Save token to localStorage
+        localStorage.setItem("token", data.token);
+
+        // Redirect to the page the user was trying to access (e.g., /post)
+        const from = location.state?.from || "/";
+        navigate(from, { replace: true });
       } else {
-        setError(data.message || "Invalid credentials.");
+        alert(data.message || "Login failed. Please try again.");
       }
     } catch (error) {
       console.error("Login error:", error);
-      setError("An error occurred. Please try again.");
+      alert("Something went wrong. Please try again.");
     }
   };
 
   return (
-    <div className="container mt-5">
-      <h2 className="text-center">🔐 Login</h2>
-      {error && <p className="alert alert-danger">{error}</p>}
-      <form onSubmit={handleSubmit} className="shadow p-4 bg-white rounded">
-        <div className="mb-3">
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            className="form-control"
-            placeholder="Enter email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="mb-3">
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            className="form-control"
-            placeholder="Enter password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <button type="submit" className="btn btn-primary w-100">
-          🚀 Login
-        </button>
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={handleLogin}>
+        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <button type="submit">Login</button>
       </form>
     </div>
   );
-}
+};
+
+export default Login;
