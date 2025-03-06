@@ -1,124 +1,60 @@
 import React, { useState } from "react";
-import { Form, Button } from "react-bootstrap";
 
-const API_BASE_URL = "https://backend-swr5.onrender.com"; // Backend link
+const PostRecipe = () => {
+    const [name, setName] = useState("");
+    const [imageUrl, setImageUrl] = useState("");
+    const [ingredients, setIngredients] = useState("");
+    const [instructions, setInstructions] = useState("");
+    const [cookingTime, setCookingTime] = useState("");
 
-export default function PostRecipe() {
-  const [recipe, setRecipe] = useState({
-    name: "",
-    image: "",
-    ingredients: "",
-    instructions: "",
-    cookingTime: "",
-  });
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-  const [message, setMessage] = useState(""); // To display success/error messages
+        const token = localStorage.getItem("token"); // Get token from localStorage
 
-  const handleChange = (e) => {
-    setRecipe({ ...recipe, [e.target.name]: e.target.value });
-  };
+        if (!token) {
+            alert("User not authenticated. Please log in.");
+            return;
+        }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+        const recipeData = { name, imageUrl, ingredients, instructions, cookingTime };
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/recipes`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(recipe),
-      });
+        try {
+            const response = await fetch("https://backend-swr5.onrender.com/api/recipes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}` // Send token in headers
+                },
+                body: JSON.stringify(recipeData),
+            });
 
-      const data = await response.json();
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to post recipe");
+            }
 
-      if (response.ok) {
-        setMessage("🎉 Recipe posted successfully!");
-        setRecipe({ name: "", image: "", ingredients: "", instructions: "", cookingTime: "" }); // Reset form
-      } else {
-        setMessage(data.message || "❌ Failed to post recipe. Try again.");
-      }
-    } catch (error) {
-      console.error("Error posting recipe:", error);
-      setMessage("❌ An error occurred. Please try again later.");
-    }
-  };
+            alert("Recipe posted successfully!");
+            // Optionally reset the form
+        } catch (error) {
+            console.error("Error:", error);
+            alert(error.message);
+        }
+    };
 
-  return (
-    <div className="container mt-5">
-      <h2 className="text-center mb-4">📌 Post a New Recipe</h2>
-      
-      {message && <p className="alert alert-info">{message}</p>} {/* Display success/error messages */}
+    return (
+        <div>
+            <h2>Post a New Recipe</h2>
+            <form onSubmit={handleSubmit}>
+                <input type="text" placeholder="Recipe Name" value={name} onChange={(e) => setName(e.target.value)} required />
+                <input type="text" placeholder="Recipe Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+                <textarea placeholder="Ingredients" value={ingredients} onChange={(e) => setIngredients(e.target.value)} required />
+                <textarea placeholder="Instructions" value={instructions} onChange={(e) => setInstructions(e.target.value)} required />
+                <input type="number" placeholder="Cooking Time (mins)" value={cookingTime} onChange={(e) => setCookingTime(e.target.value)} required />
+                <button type="submit">Post Recipe</button>
+            </form>
+        </div>
+    );
+};
 
-      <Form onSubmit={handleSubmit} className="shadow-lg p-4 bg-white rounded">
-        {/* Recipe Name */}
-        <Form.Group className="mb-3">
-          <Form.Label>Recipe Name</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter recipe name"
-            name="name"
-            value={recipe.name}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
-
-        {/* Image URL */}
-        <Form.Group className="mb-3">
-          <Form.Label>Recipe Image URL</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Paste an image URL"
-            name="image"
-            value={recipe.image}
-            onChange={handleChange}
-          />
-        </Form.Group>
-
-        {/* Ingredients */}
-        <Form.Group className="mb-3">
-          <Form.Label>Ingredients</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            placeholder="List ingredients separated by commas"
-            name="ingredients"
-            value={recipe.ingredients}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
-
-        {/* Instructions */}
-        <Form.Group className="mb-3">
-          <Form.Label>Instructions</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={4}
-            placeholder="Step-by-step instructions"
-            name="instructions"
-            value={recipe.instructions}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
-
-        {/* Cooking Time */}
-        <Form.Group className="mb-3">
-          <Form.Label>Cooking Time (in minutes)</Form.Label>
-          <Form.Control
-            type="number"
-            name="cookingTime"
-            placeholder="Enter time"
-            value={recipe.cookingTime}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
-
-        <Button variant="primary" type="submit" className="w-100">
-          🚀 Post Recipe
-        </Button>
-      </Form>
-    </div>
-  );
-}
+export default PostRecipe;
