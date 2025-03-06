@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const API_BASE_URL = "https://backend-swr5.onrender.com"; // Backend link
+const API_BASE_URL = "https://backend-swr5.onrender.com"; // Backend URL
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +9,8 @@ const Register = () => {
     password: "",
   });
 
-  const [message, setMessage] = useState(""); // Store success/error messages
+  const [message, setMessage] = useState(""); // Success/Error message
+  const [loading, setLoading] = useState(false); // Loading state
 
   // Handle Input Changes
   const handleChange = (e) => {
@@ -19,15 +20,26 @@ const Register = () => {
   // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setMessage("");
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // Important for session-based authentication
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get("Content-Type");
+
+      // Handle non-JSON responses (prevents syntax errors)
+      let data;
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        data = { message: "❌ Server returned an invalid response." };
+      }
 
       if (response.ok) {
         setMessage("🎉 Registration successful! You can now log in.");
@@ -38,6 +50,8 @@ const Register = () => {
     } catch (error) {
       console.error("Error during registration:", error);
       setMessage("❌ An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,7 +59,11 @@ const Register = () => {
     <div className="container mt-4">
       <h2>Register</h2>
 
-      {message && <p className="alert alert-info">{message}</p>} {/* Show success/error messages */}
+      {message && (
+        <p className={`alert ${message.includes("successful") ? "alert-success" : "alert-danger"}`}>
+          {message}
+        </p>
+      )}
 
       <form onSubmit={handleSubmit}>
         <input
@@ -75,7 +93,9 @@ const Register = () => {
           onChange={handleChange}
           required
         />
-        <button className="btn btn-primary w-100">Register</button>
+        <button className="btn btn-primary w-100" disabled={loading}>
+          {loading ? "Registering..." : "Register"}
+        </button>
       </form>
     </div>
   );
