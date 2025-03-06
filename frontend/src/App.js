@@ -13,7 +13,7 @@ import PostRecipe from "./pages/PostRecipe";
 
 const isAuthenticated = () => !!localStorage.getItem("token");
 
-// Wrapper for Protected Routes
+// Protected Route Wrapper
 const ProtectedRoute = ({ element }) => {
   const location = useLocation();
   return isAuthenticated() ? element : <Navigate to="/login" state={{ from: location.pathname }} replace />;
@@ -32,7 +32,7 @@ const App = () => {
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/recipe/:id" element={<RecipeDetails />} />
 
-          {/* 🔒 Protected Routes with Redirect */}
+          {/* 🔒 Protected Routes */}
           <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
           <Route path="/post" element={<ProtectedRoute element={<PostRecipe />} />} />
           <Route path="/edit/:id" element={<ProtectedRoute element={<EditRecipe />} />} />
