@@ -22,7 +22,7 @@ export default function Navigation() {
 
         if (response.ok) {
           const userData = await response.json();
-          setUser(userData);
+          setUser(userData); // Store user data
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -50,12 +50,11 @@ export default function Navigation() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
-              <Nav.Link as={Link} to="/post">➕ Post Recipe</Nav.Link>
-              <Nav.Link as={Link} to="/about">About</Nav.Link>
-              <Nav.Link as={Link} to="/contact">Contact Us</Nav.Link>
-
               {user ? (
                 <>
+                  <Nav.Link as={Link} to="/post">➕ Post Recipe</Nav.Link>
+                  <Nav.Link as={Link} to="/contact">Contact Us</Nav.Link>
+                  <Nav.Link as={Link} to="/about">About</Nav.Link>
                   <Nav.Link as={Link} to="/profile">👤 {user.username}</Nav.Link>
                   <Button variant="outline-danger" className="ms-2" onClick={handleLogout}>
                     🚪 Logout
