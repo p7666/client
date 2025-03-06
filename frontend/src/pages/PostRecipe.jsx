@@ -10,7 +10,7 @@ const PostRecipe = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const token = localStorage.getItem("token"); // Get token from localStorage
+        const token = localStorage.getItem("token");
 
         if (!token) {
             alert("User not authenticated. Please log in.");
@@ -24,7 +24,7 @@ const PostRecipe = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}` // Send token in headers
+                    "Authorization": `Bearer ${token}`
                 },
                 body: JSON.stringify(recipeData),
             });
@@ -35,7 +35,12 @@ const PostRecipe = () => {
             }
 
             alert("Recipe posted successfully!");
-            // Optionally reset the form
+            // Reset form
+            setName("");
+            setImageUrl("");
+            setIngredients("");
+            setInstructions("");
+            setCookingTime("");
         } catch (error) {
             console.error("Error:", error);
             alert(error.message);
@@ -43,16 +48,33 @@ const PostRecipe = () => {
     };
 
     return (
-        <div>
-            <h2>Post a New Recipe</h2>
-            <form onSubmit={handleSubmit}>
-                <input type="text" placeholder="Recipe Name" value={name} onChange={(e) => setName(e.target.value)} required />
-                <input type="text" placeholder="Recipe Image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-                <textarea placeholder="Ingredients" value={ingredients} onChange={(e) => setIngredients(e.target.value)} required />
-                <textarea placeholder="Instructions" value={instructions} onChange={(e) => setInstructions(e.target.value)} required />
-                <input type="number" placeholder="Cooking Time (mins)" value={cookingTime} onChange={(e) => setCookingTime(e.target.value)} required />
-                <button type="submit">Post Recipe</button>
-            </form>
+        <div className="container mt-5">
+            <div className="card shadow-lg p-4">
+                <h2 className="text-center mb-4">Post a New Recipe</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                        <label className="form-label">Recipe Name</label>
+                        <input type="text" className="form-control" placeholder="Enter recipe name" value={name} onChange={(e) => setName(e.target.value)} required />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">Image URL</label>
+                        <input type="text" className="form-control" placeholder="Enter image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">Ingredients</label>
+                        <textarea className="form-control" rows="3" placeholder="Enter ingredients" value={ingredients} onChange={(e) => setIngredients(e.target.value)} required />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">Instructions</label>
+                        <textarea className="form-control" rows="4" placeholder="Enter instructions" value={instructions} onChange={(e) => setInstructions(e.target.value)} required />
+                    </div>
+                    <div className="mb-3">
+                        <label className="form-label">Cooking Time (mins)</label>
+                        <input type="number" className="form-control" placeholder="Enter cooking time" value={cookingTime} onChange={(e) => setCookingTime(e.target.value)} required />
+                    </div>
+                    <button type="submit" className="btn btn-primary w-100">Post Recipe</button>
+                </form>
+            </div>
         </div>
     );
 };
