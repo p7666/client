@@ -1,35 +1,43 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-const RecipeDetails = ({ recipeId, onClose }) => {
-    const [recipe, setRecipe] = useState(null);
+const API_URL = "https://backend-swr5.onrender.com"; // Updated backend URL
 
-    useEffect(() => {
-        fetch(`https://backend-swr5.onrender.com/api/recipes/${recipeId}`)
-            .then(res => res.json())
-            .then(data => setRecipe(data))
-            .catch(err => console.error("Error fetching recipe:", err));
-    }, [recipeId]);
+const RecipeDetails = () => {
+  const { id } = useParams(); // Get Recipe ID from URL
+  const [recipe, setRecipe] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    if (!recipe) return <p>Loading...</p>;
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/recipes/${id}`); // Updated API call
+        if (!response.ok) {
+          throw new Error("Recipe not found");
+        }
+        const data = await response.json();
+        setRecipe(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchRecipe();
+  }, [id]);
 
-    return (
-        <div className="modal show d-block" tabIndex="-1">
-            <div className="modal-dialog">
-                <div className="modal-content">
-                    <div className="modal-header">
-                        <h5 className="modal-title">{recipe.name}</h5>
-                        <button type="button" className="btn-close" onClick={onClose}></button>
-                    </div>
-                    <div className="modal-body">
-                        <img src={recipe.imageUrl || "default-image.jpg"} className="img-fluid mb-3" alt={recipe.name} />
-                        <p><strong>Cooking Time:</strong> {recipe.cookingTime} mins</p>
-                        <p><strong>Ingredients:</strong> {recipe.ingredients}</p>
-                        <p><strong>Instructions:</strong> {recipe.instructions}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+  if (loading) return <h2>Loading...</h2>;
+  if (error) return <h2>{error}</h2>;
+
+  return (
+    <div className="container">
+      <h2>{recipe.title}</h2>
+      <img src={recipe.image} alt={recipe.title} className="img-fluid" />
+      <p>Cooking Time: {recipe.cookingTime} mins</p>
+      <p>{recipe.description}</p>
+    </div>
+  );
 };
 
 export default RecipeDetails;
