@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { API_URL } from "../App"; // Import API URL from App.js
+
+const API_URL = "https://backend-swr5.onrender.com"; // Ensure API URL is correct
 
 const RecipeDetails = () => {
   const { id } = useParams(); // Get Recipe ID from URL
@@ -11,7 +12,7 @@ const RecipeDetails = () => {
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/recipes/${id}`); // Fetching from Render backend
+        const response = await fetch(`${API_URL}/api/recipes/${id}`); // Correct API Call
         if (!response.ok) {
           throw new Error("Recipe not found");
         }
@@ -27,15 +28,24 @@ const RecipeDetails = () => {
     fetchRecipe();
   }, [id]);
 
-  if (loading) return <h2>Loading...</h2>;
-  if (error) return <h2>{error}</h2>;
+  if (loading) return <h2 className="text-center">Loading...</h2>;
+  if (error) return <h2 className="text-danger text-center">{error}</h2>;
+
+  if (!recipe) return <h2 className="text-center">No recipe found.</h2>;
 
   return (
-    <div className="container">
-      <h2>{recipe.title}</h2>
-      <img src={recipe.image} alt={recipe.title} className="img-fluid" />
-      <p>Cooking Time: {recipe.cookingTime} mins</p>
-      <p>{recipe.description}</p>
+    <div className="container mt-4">
+      <h2 className="text-center">{recipe.title}</h2>
+      <div className="text-center">
+        <img
+          src={recipe.image}
+          alt={recipe.title}
+          className="img-fluid rounded"
+          style={{ maxWidth: "400px" }}
+        />
+      </div>
+      <p className="mt-3"><strong>Cooking Time:</strong> {recipe.cookingTime} mins</p>
+      <p><strong>Description:</strong> {recipe.description}</p>
     </div>
   );
 };
