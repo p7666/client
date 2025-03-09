@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { API_URL } from "../App";
+const response = await fetch(`${API_URL}/api/recipes/${id}`);
 
 const API_URL = "https://backend-swr5.onrender.com"; // Updated backend URL
 
