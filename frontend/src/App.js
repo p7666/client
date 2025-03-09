@@ -11,12 +11,16 @@ import EditRecipe from "./pages/EditRecipe";
 import RecipeList from "./pages/RecipeList";
 import PostRecipe from "./pages/PostRecipe";
 
+// Backend API URL (Use this in all API calls)
+export const API_URL = "https://backend-swr5.onrender.com";
+
+// Authentication Check
 const isAuthenticated = () => !!localStorage.getItem("token");
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ element }) => {
   const location = useLocation();
-  return isAuthenticated() ? element : <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  return isAuthenticated() ? element : <Navigate to="/login" state={{ from: location }} replace />;
 };
 
 const App = () => {
@@ -37,6 +41,7 @@ const App = () => {
           <Route path="/post" element={<ProtectedRoute element={<PostRecipe />} />} />
           <Route path="/edit/:id" element={<ProtectedRoute element={<EditRecipe />} />} />
 
+          {/* Redirect unknown routes to home */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
