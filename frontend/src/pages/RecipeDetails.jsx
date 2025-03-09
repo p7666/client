@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { API_URL } from "../App";
-const response = await fetch(`${API_URL}/api/recipes/${id}`);
-
-const API_URL = "https://backend-swr5.onrender.com"; // Updated backend URL
+import { API_URL } from "../App"; // Import API URL from App.js
 
 const RecipeDetails = () => {
   const { id } = useParams(); // Get Recipe ID from URL
@@ -14,7 +11,7 @@ const RecipeDetails = () => {
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/recipes/${id}`); // Updated API call
+        const response = await fetch(`${API_URL}/api/recipes/${id}`); // Fetching from Render backend
         if (!response.ok) {
           throw new Error("Recipe not found");
         }
@@ -26,6 +23,7 @@ const RecipeDetails = () => {
         setLoading(false);
       }
     };
+
     fetchRecipe();
   }, [id]);
 
