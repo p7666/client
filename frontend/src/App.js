@@ -6,12 +6,11 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import ContactUs from "./pages/ContactUs";
-import RecipeDetails from "./pages/RecipeDetails";
 import EditRecipe from "./pages/EditRecipe";
 import RecipeList from "./pages/RecipeList";
 import PostRecipe from "./pages/PostRecipe";
 
-// Backend API URL (Use this in all API calls)
+// Backend API URL
 export const API_URL = "https://backend-swr5.onrender.com";
 
 // Authentication Check
@@ -34,7 +33,6 @@ const App = () => {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/contact" element={<ContactUs />} />
-          <Route path="/recipe/:id" element={<RecipeDetails />} />
 
           {/* 🔒 Protected Routes */}
           <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
